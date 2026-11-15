@@ -552,6 +552,35 @@ impl TouchControls {
                 }
             }
         }
+        // On a screen nearer square than a phone's (an iPad) the factory top row's buttons are
+        // wider than their places: the row spreads from its middle until they stand apart.
+        // Phones, and every position the player chose, are left as they are.
+        if self.aspect() >= 1.0
+            && p.center[1] == 0.055
+            && p.size == 0.075
+            && matches!(
+                c,
+                Control::Debug
+                    | Control::Chat
+                    | Control::Pause
+                    | Control::Settings
+                    | Control::Perspective
+            )
+        {
+            let wide = p.size / self.aspect();
+            let x = p.center[0];
+            let factory = if self.settings.left_handed {
+                1.0 - x
+            } else {
+                x
+            };
+            let placed = [0.42, 0.46, 0.50, 0.54, 0.58]
+                .iter()
+                .any(|f: &f32| (factory - f).abs() < 0.0001);
+            if wide > 0.045 && placed {
+                p.center[0] = 0.5 + (x - 0.5) * (wide * 1.05 / 0.04);
+            }
+        }
         let mut p = self.fit_placement(p);
         if factory_swap {
             // Keep the factory Swap beside Inventory in physical button units,
@@ -3039,5 +3068,36 @@ mod tests {
         touch.update(2, center, false, true);
         touch.poll_state(); // consume the queued tap
         assert!(!touch.poll_state().held(Button::LeftStick));
+    }
+
+    /// An iPad's screen is nearer square than a phone's: the factory top row spreads from its
+    /// middle until its buttons stand apart, on the screen. A phone's row is where it always was.
+    #[test]
+    fn the_top_row_stands_apart_on_an_ipad_and_stays_put_on_a_phone() {
+        let top = [
+            Control::Debug,
+            Control::Chat,
+            Control::Pause,
+            Control::Settings,
+            Control::Perspective,
+        ];
+        let mut pad = TouchControls::default();
+        pad.viewport(2048, 1536);
+        let rects: Vec<_> = top
+            .iter()
+            .map(|c| pad.placement(*c).rect(pad.aspect()))
+            .collect();
+        for pair in rects.windows(2) {
+            assert!(pair[0][0] + pair[0][2] < pair[1][0], "{rects:?}");
+        }
+        assert!(
+            rects[0][0] >= 0.0 && rects[4][0] + rects[4][2] <= 1.0,
+            "{rects:?}"
+        );
+        assert_eq!(pad.placement(Control::Pause).center[0], 0.5);
+        let mut wide = TouchControls::default();
+        wide.viewport(1920, 1080);
+        assert_eq!(wide.placement(Control::Debug).center[0], 0.42);
+        assert_eq!(wide.placement(Control::Perspective).center[0], 0.58);
     }
 }
