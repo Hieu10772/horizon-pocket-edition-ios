@@ -98,6 +98,8 @@ Every change to a file Starling has, in the order they were made.
 | `horizon-gamecontroller/src/lib.rs`, `Cargo.toml` (block2, log) | Background time asked for or given back from another thread is done on the main thread (GCD), and has an expiration handler that gives it back | iOS no longer ends the game for background time never returned (a Microsoft sign-in in Safari) |
 | `horizon-client/src/ios.rs`, `game.rs`, `game/no_resources.rs` | The window prefers the home bar hidden and defers the bottom and top edges' system gestures (`ios::window_attributes`) | The home bar fades, and a thumb at the edge doesn't open Type to Siri or the Control Center |
 | `horizon-client-render/src/android_controls/layout.rs` | `virtual_mouse_enabled` defaults to on on iOS, and `DEFAULTS_REV` 2 turns it on once in older iOS settings | The virtual mouse is on by default on iOS (Android unchanged) |
+| `horizon-client-render/src/extras.rs` | `wheel_cycles_settings` is off by default on iOS, and an older iOS extras file has it turned off once (`phoneDefaults`) | Scrolling the settings with a finger doesn't change them |
+| `horizon-client/src/shared_screen.rs`, `friends_screen.rs` | The shared world's Friends screen shows the invite code with Copy Code beside Done; `friends_screen::code_lines` shared | The code of a shared world's host |
 
 ## Gate ledger
 
