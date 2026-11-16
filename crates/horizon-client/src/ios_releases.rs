@@ -177,10 +177,7 @@ mod tests {
         assert_eq!(update_in(&releases, Edition::SharedWorlds, "1.2.0"), None);
         assert_eq!(update_in(&releases, Edition::Standard, "2.0.0"), None);
         // 1.10 comes after 1.9, number by number.
-        let releases = json!([
-            release("v1.9.0", "a.ipa"),
-            release("v1.10.0", "b.ipa")
-        ]);
+        let releases = json!([release("v1.9.0", "a.ipa"), release("v1.10.0", "b.ipa")]);
         assert_eq!(
             update_in(&releases, Edition::Standard, "1.0.0")
                 .unwrap()
@@ -196,7 +193,8 @@ mod tests {
         let mut pre = release("v2.5.0", "HorizonPE-2.5.0.ipa");
         pre["prerelease"] = json!(true);
         let mut bare = release("v2.0.0", "HorizonPE-2.0.0.ipa");
-        bare["assets"] = json!([{"name": "source.zip", "browser_download_url": "https://example.test/s.zip"}]);
+        bare["assets"] =
+            json!([{"name": "source.zip", "browser_download_url": "https://example.test/s.zip"}]);
         let mut plain_http = release("v1.5.0", "HorizonPE-1.5.0.ipa");
         plain_http["assets"][1]["browser_download_url"] = json!("http://example.test/x.ipa");
         let releases = json!([

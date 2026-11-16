@@ -265,10 +265,7 @@ impl Game<'_> {
                 .spawn(move || match check(&current) {
                     Ok(release) => {
                         if let Some(r) = &release {
-                            log::info!(
-                                "Horizon: {NAME} {} is out (this is {current})",
-                                r.version
-                            );
+                            log::info!("Horizon: {NAME} {} is out (this is {current})", r.version);
                         }
                         shared
                             .lock()
@@ -301,9 +298,7 @@ impl Game<'_> {
     /// Over the title only, and not over the offer of the Starling folder (iOS: nor the catalog,
     /// which opens over the title).
     fn update_offer_shown(&self) -> Option<Stage> {
-        if self.title.is_none() {
-            return None;
-        }
+        self.title.as_ref()?;
         #[cfg(target_os = "android")]
         if self.files_offer_shown().is_some() {
             return None;
