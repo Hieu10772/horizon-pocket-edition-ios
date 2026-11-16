@@ -1264,7 +1264,10 @@ impl Game<'_> {
         // rested on it (`Action::MouseGrip`), and where it is let go is kept.
         self.mobile.ui.mouse_buttons_pos = self.mobile.controls.settings.mouse_buttons_pos;
         let ended = t.phase == TouchPhase::Ended;
-        let grip = self.mobile.ui.mouse_grip_move(t.id, p, [b.width, b.height], ended);
+        let grip = self
+            .mobile
+            .ui
+            .mouse_grip_move(t.id, p, [b.width, b.height], ended);
         if let Some(pos) = grip {
             let moved = self.mobile.controls.settings.mouse_buttons_pos != pos;
             self.mobile.controls.settings.mouse_buttons_pos = pos;
