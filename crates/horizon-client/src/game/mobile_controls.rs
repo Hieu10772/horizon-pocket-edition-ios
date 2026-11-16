@@ -1056,6 +1056,7 @@ impl Game<'_> {
             return;
         }
         self.mobile.ui.virtual_mouse = true;
+        self.mobile.ui.mouse_buttons_pos = self.mobile.controls.settings.mouse_buttons_pos;
         if let Some(b) = self.gui_scale() {
             self.mobile
                 .ui
@@ -1259,6 +1260,20 @@ impl Game<'_> {
         };
         let mut b = HudBatch::new([size.width, size.height]);
         let p = [t.location.x as f32 / b.scale, t.location.y as f32 / b.scale];
+        // The grip over the virtual mouse's LMB and RMB: the pair follows the finger that
+        // took hold of it (`Action::MouseGrip`), and where it is let go is kept.
+        self.mobile.ui.mouse_buttons_pos = self.mobile.controls.settings.mouse_buttons_pos;
+        let ended = t.phase == TouchPhase::Ended;
+        let grip = self.mobile.ui.mouse_grip_move(t.id, p, [b.width, b.height], ended);
+        if let Some(pos) = grip {
+            self.mobile.controls.settings.mouse_buttons_pos = Some(pos);
+            if ended {
+                self.mobile.controls.consume_ignored(t.id, true);
+                self.settings.touch = self.mobile.controls.settings.clone();
+                let _ = self.mobile.controls.settings.save();
+            }
+            return Ok(true);
+        }
         if !self.mobile.ui.owns_relative(t.id)
             && !self.mobile.ui.owns_gesture(t.id)
             && let Some(menu_act) = self.mobile.ui.floating_menu_touch(
@@ -1610,7 +1625,7 @@ impl Game<'_> {
             {
                 // LMB and RMB press like a mouse's buttons: Shift latched over an inventory (a
                 // quick move) and walking stay as they are.
-                if !matches!(action, Action::MouseButton(_)) {
+                if !matches!(action, Action::MouseButton(_) | Action::MouseGrip) {
                     self.mobile.controls.clear();
                 }
                 self.mobile.controls.ignore(t.id);
@@ -1648,6 +1663,9 @@ impl Game<'_> {
                         if self.mobile.ui.press_mouse(t.id, right) {
                             self.android_menu_mouse(events, id, right, true)?;
                         }
+                    }
+                    Action::MouseGrip => {
+                        self.mobile.ui.mouse_grip_start(t.id, p, [b.width, b.height]);
                     }
                     Action::VirtualMouse => {
                         if matches!(self.screen, Screen::Inventory | Screen::Creative) {
