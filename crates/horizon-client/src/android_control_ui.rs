@@ -1029,19 +1029,18 @@ impl TouchUi {
 /// One of the virtual mouse's buttons: `button`'s plate at the size it is pressed at, its
 /// name in the middle.
 fn mouse_button(b: &mut HudBatch, a: &HudAtlas, label: &str, [x, y, w, h]: [f32; 4]) {
-    if !crate::android_controls::theme_button(
-        b,
-        a,
-        "button",
-        [x, y, w, h],
-        false,
-        u32::MAX,
-        true,
-    ) {
+    if !crate::android_controls::theme_button(b, a, "button", [x, y, w, h], false, u32::MAX, true) {
         b.fill(a, x, y, w, h, rgba(16, 18, 24, 180));
     }
     let text_x = x + (w - HudBatch::text_width(a, label)) * 0.5;
-    b.text(a, label, text_x, y + (h - 8.0) * 0.5, rgba(245, 245, 245, 255), true);
+    b.text(
+        a,
+        label,
+        text_x,
+        y + (h - 8.0) * 0.5,
+        rgba(245, 245, 245, 255),
+        true,
+    );
 }
 
 fn button(b: &mut HudBatch, a: &HudAtlas, label: &str, x: f32, y: f32, w: f32) {
