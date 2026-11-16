@@ -94,6 +94,10 @@ Every change to a file Starling has, in the order they were made.
 | `horizon-client/src/game/native_client_services.rs` | `native_set_mod_key`, `native_client_action_bar`, `native_apply_screen_blur` (false: Options and pause already blur) | dynamiclights' key binding, toggle message and screen |
 | `horizon-client/src/mobs/armor.rs` (new), `mobs.rs` | `mobs::armor::values`: armour and toughness as `hurt_after_armor` sums them | Jade's health-and-armour line |
 | `packaging/android/native_mod_adapt.py` | Rewrites: burning projectiles from `arrow.on_fire()` (no fire time here), `mob_hit()` as a pair, `key_pressed` with one key, a pet's body armour from `extra.head` | dynamiclights and Jade, pinned to newer Horizon |
+| `horizon-client/src/game/setup.rs`, `game/setup/account_form.rs` | Text typed with no key code (iOS's on-screen keyboard) goes into the first-run account form (`Form::type_text`) | Typing an offline name on first launch |
+| `horizon-gamecontroller/src/lib.rs`, `Cargo.toml` (block2, log) | Background time asked for or given back from another thread is done on the main thread (GCD), and has an expiration handler that gives it back | iOS no longer ends the game for background time never returned (a Microsoft sign-in in Safari) |
+| `horizon-client/src/ios.rs`, `game.rs`, `game/no_resources.rs` | The window prefers the home bar hidden and defers the bottom and top edges' system gestures (`ios::window_attributes`) | The home bar fades, and a thumb at the edge doesn't open Type to Siri or the Control Center |
+| `horizon-client-render/src/android_controls/layout.rs` | `virtual_mouse_enabled` defaults to on on iOS, and `DEFAULTS_REV` 2 turns it on once in older iOS settings | The virtual mouse is on by default on iOS (Android unchanged) |
 
 ## Gate ledger
 
