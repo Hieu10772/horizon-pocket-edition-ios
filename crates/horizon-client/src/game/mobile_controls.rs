@@ -1260,16 +1260,21 @@ impl Game<'_> {
         };
         let mut b = HudBatch::new([size.width, size.height]);
         let p = [t.location.x as f32 / b.scale, t.location.y as f32 / b.scale];
-        // The grip over the virtual mouse's LMB and RMB: the pair follows the finger that
-        // took hold of it (`Action::MouseGrip`), and where it is let go is kept.
+        // The grip over the virtual mouse's LMB and RMB: the pair follows a finger that has
+        // rested on it (`Action::MouseGrip`), and where it is let go is kept.
         self.mobile.ui.mouse_buttons_pos = self.mobile.controls.settings.mouse_buttons_pos;
         let ended = t.phase == TouchPhase::Ended;
         let grip = self.mobile.ui.mouse_grip_move(t.id, p, [b.width, b.height], ended);
         if let Some(pos) = grip {
-            self.mobile.controls.settings.mouse_buttons_pos = Some(pos);
+            let moved = self.mobile.controls.settings.mouse_buttons_pos != pos;
+            self.mobile.controls.settings.mouse_buttons_pos = pos;
             if ended {
                 self.mobile.controls.consume_ignored(t.id, true);
+            }
+            if moved || ended {
                 self.settings.touch = self.mobile.controls.settings.clone();
+            }
+            if ended {
                 let _ = self.mobile.controls.settings.save();
             }
             return Ok(true);
@@ -1665,7 +1670,7 @@ impl Game<'_> {
                         }
                     }
                     Action::MouseGrip => {
-                        self.mobile.ui.mouse_grip_start(t.id, p, [b.width, b.height]);
+                        self.mobile.ui.mouse_grip_start(t.id, p);
                     }
                     Action::VirtualMouse => {
                         if matches!(self.screen, Screen::Inventory | Screen::Creative) {
